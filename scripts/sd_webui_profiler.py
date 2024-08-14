@@ -33,7 +33,7 @@ def patch_functions():
 
 get_profile_functions()
 
-shared.options_templates.update(shared.options_section(('profiler', "Profiler"), {
+shared.options_templates.update(shared.options_section(('profiler_adv', 'Advance Profiler'), {
     'torch_profiler_enable': shared.OptionInfo(True, "Enable torch profiler"),
     'torch_profiler_wrapped_functions': shared.OptionInfo(
         default_profile_functions,
