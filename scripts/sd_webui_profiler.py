@@ -42,7 +42,7 @@ shared.options_templates.update(shared.options_section(('profiler_adv', 'Advance
         {
             'lines': 5,
         },
-        onchange=lambda: get_profile_functions() and patch_functions()
+        onchange=lambda: (get_profile_functions(), patch_functions())
     ).needs_restart(),
     'torch_profiler_disable_profiler': shared.OptionInfo(
         [],
