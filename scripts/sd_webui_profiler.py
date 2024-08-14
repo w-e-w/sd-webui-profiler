@@ -64,6 +64,7 @@ def torch_profiler_wrapper(func, full_name):
         if not shared.opts.torch_profiler_enable or full_name in shared.opts.torch_profiler_disable_profiler:
             return func(*args, **kwargs)
 
+        gr.Info(f'Profiling {full_name}')
         from torch.profiler import profile, record_function, ProfilerActivity
         with profile(
                 activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
@@ -73,6 +74,7 @@ def torch_profiler_wrapper(func, full_name):
         ) as prof:
             with record_function('model_inference'):
                 res = func(*args, **kwargs)
+                gr.Info(f'{full_name} finished, collecting profiler data')
 
         if shared.opts.torch_profiler_console_report_row_limit:
             print(prof.key_averages().table(sort_by='cpu_time_total', row_limit=shared.opts.torch_profiler_console_report_row_limit))
@@ -80,6 +82,7 @@ def torch_profiler_wrapper(func, full_name):
             output_name = trace_output / full_name / f'{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
             output_name.parent.mkdir(parents=True, exist_ok=True)
             prof.export_chrome_trace(str(output_name))
+            gr.Info(f'Profiling {full_name} trace saved to {output_name}')
         return res
 
     return wrapper
