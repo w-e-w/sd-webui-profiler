@@ -1,6 +1,6 @@
 from modules import patches, script_callbacks, errors, shared, ui_components, scripts
 from datetime import datetime
-from functools import wraps
+from functools import wraps, partial
 from pathlib import Path
 import gradio as gr
 import importlib
@@ -26,8 +26,11 @@ def get_profile_functions():
         return default_profile_functions
 
 
-def patch_functions():
+def patch_functions(*args, callback=None, **kwargs):
     for function in all_profile_functions:
+        function, _, at_callback = function.partition('@')
+        if callback is not None and at_callback != callback:
+            continue
         enable_profiler(function)
 
 
@@ -107,4 +110,5 @@ def enable_profiler(module_name_function_name):
         errors.report(f'Error enabling profiler for {module_name_function_name}', exc_info=True)
 
 
-patch_functions()
+patch_functions(callback='')
+script_callbacks.on_app_started(partial(patch_functions, callback='on_app_started'))
