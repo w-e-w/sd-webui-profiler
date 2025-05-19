@@ -100,7 +100,10 @@ def enable_profiler(module_name_function_name):
             patches.patch(__name__, module, function_name, torch_profiler_wrapper(function, full_name=f'{module_name}.{function_name}'))
 
             def undo_profiler():
-                patches.undo(__name__, module, function_name)
+                try:
+                    patches.undo(__name__, module, function_name)
+                except RuntimeError:
+                    pass
 
             script_callbacks.on_script_unloaded(undo_profiler)
         except RuntimeError:
